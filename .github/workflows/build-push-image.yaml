@@ -34,14 +34,21 @@ jobs:
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/my-image:latest
       - name: Change deployment.yaml image tag in other repository namespace-deployment
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ github.repository_owner }}/namespace-deployment
+          ref: main
+      - name: Update image tag in deployment.yaml
         run: |
-          git clone https://github.com/lennertvandevelde/namespace-deployment.git
+          sed -i 's|image: ghcr.io/.*/my-image:.*|image: ghcr.io/'${{ github.repository_owner }}'/my-image:'${{ github.sha'}|' namespace-deployment/deployment.yaml
+      - name: Commit and push changes
+        run: |
           cd namespace-deployment
-          sed -i "s|image: ghcr.io/.*/my-image:.*|image: ghcr.io/${{ github.repository_owner }}/my-image:${{ github.sha }}|g" deployment.yaml
-          git config --global user.name "github-actions"
-          git config --global user.email ${{ github.actor }}@users.noreply.github.com
-          git commit -am "Update image tag to ${{ github.sha }}"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/lennertvandevelde/namespace-deployment.git HEAD:main
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add deployment.yaml
+          git commit -m 'Update image tag to ${{ github.sha }}'
+          git push origin main
       - name: Clean up
         run: |
           rm -rf namespace-deployment
