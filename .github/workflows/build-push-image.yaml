@@ -46,6 +46,8 @@ jobs:
           sed -i 's|image: ghcr.io/.*/my-image:.*|image: ghcr.io/'"${{ github.repository_owner }}"'/my-image:'"${{ github.sha }}"'|g' deployment.yaml
       - name: Commit and push changes
         run: |
+          ls
+          cd namespace-deployment
           # Add github token for deployment repo push
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository_owner }}/namespace-deployment.git
           git config --global user.name 'github-actions[bot]'
