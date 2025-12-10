@@ -43,7 +43,7 @@ jobs:
       - name: Update image tag in deployment.yaml
         uses: mikefarah/yq@v4.49.2
         with: 
-          cmd: cd namespace-deployment; jq -i '.spec.template.spec.containers[0].image = "ghcr.io/'"${{ github.repository_owner }}"'/my-image:'"${{ github.sha }}"'"' deployment.yaml
+          cmd: cd namespace-deployment; yq -i '.spec.template.spec.containers[0].image = "ghcr.io/'"${{ github.repository_owner }}"'/my-image:'"${{ github.sha }}"'"' deployment.yaml
       - name: Commit and push changes with secrets.DEPLOYMENT_TOKEN with write access
         run: |
           cd namespace-deployment
