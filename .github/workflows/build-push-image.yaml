@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-
+      - qas
 env:
   IMAGE_NAME: ${{ github.event.repository.name }}
   DEPLOYMENT_REPO_NAME: namespace-deployment
@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -33,25 +32,3 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ env.short_sha }}
-      - name: Checkout ${{ env.DEPLOYMENT_REPO_NAME }} repository
-        uses: actions/checkout@v6
-        with:
-          repository: ${{ github.repository_owner }}/${{ env.DEPLOYMENT_REPO_NAME }}
-          path: ${{ env.DEPLOYMENT_REPO_NAME }}
-          token: ${{ secrets.DEPLOYMENT_TOKEN }}
-          ref: main
-      - name: Update image tag in deployment.yaml
-        uses: mikefarah/yq@v4.49.2
-        with: 
-          cmd: cd ${{ env.DEPLOYMENT_REPO_NAME }}; yq -i '.spec.template.spec.containers[0].image = "ghcr.io/'"${{ github.repository_owner }}"'/${{ env.IMAGE_NAME }}:'"${{ env.short_sha }}"'"' deployment.yaml
-      - name: Commit and push changes to ${{ env.DEPLOYMENT_REPO_NAME }} repository
-        run: |
-          cd ${{ env.DEPLOYMENT_REPO_NAME }}
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add deployment.yaml
-          git commit -m "Update image tag to ${{ env.short_sha }}" || echo "No changes to commit"
-          git push origin main
-      - name: Clean up
-        run: |
-          rm -rf namespace-deployment
