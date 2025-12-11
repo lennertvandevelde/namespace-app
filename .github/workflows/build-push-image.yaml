@@ -40,6 +40,7 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ env.short_sha }}
   change-image-tag:
     runs-on: ubuntu-latest
+    needs: build-and-push
     permissions:
       contents: read
     steps:
