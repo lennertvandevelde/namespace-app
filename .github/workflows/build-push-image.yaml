@@ -71,7 +71,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add deployment.yaml
-          git commit -m "Update image tag to ${{ env.short_sha }}" || echo "No changes to commit"
+          git commit -m "Update image tag ${{ env.ENV_FOLDER }} to ${{ env.short_sha }}" || echo "No changes to commit"
           git push origin main
       - name: Clean up
         run: |
